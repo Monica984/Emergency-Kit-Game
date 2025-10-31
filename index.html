@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emergency Kit Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f8f9fa;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #0069d9;
+    }
+    .btn {
+      background: #0069d9;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .btn:hover {
+      background: #0053aa;
+    }
+    .item {
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 5px;
+      background: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .item:hover {
+      background: #e9ecef;
+    }
+    .wrong {
+      background: #f8d7da;
+      color: #721c24;
+      border-color: #f5c6cb;
+    }
+    .right {
+      background: #d4edda;
+      color: #155724;
+      border-color: #c3e6cb;
+    }
+    #gameArea {
+      margin-top: 20px;
+    }
+    #timer, #score {
+      font-size: 1.2em;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Emergency Kit Packing Game</h1>
+  <p>Select a disaster to start packing your emergency kit!</p>
+
+  <button class="btn" onclick="startGame('earthquake')">Earthquake</button>
+  <button class="btn" onclick="startGame('flood')">Flood</button>
+  <button class="btn" onclick="startGame('cyclone')">Cyclone</button>
+  <button class="btn" onclick="startGame('fire')">Fire</button>
+
+  <div id="gameArea"></div>
+  <div id="timer"></div>
+  <div id="score"></div>
+
+  <script>
+    const disasterItems = {
+      earthquake: ["First Aid Kit", "Whistle", "Blanket", "Flashlight", "Snacks", "Sunscreen", "Makeup Kit"],
+      flood: ["Water Bottle", "Whistle", "Blanket", "Raincoat", "Canned Food", "Mirror", "Sunglasses"],
+      cyclone: ["Whistle", "Blanket", "First Aid Kit", "Dry Food", "Extra Batteries", "Perfume", "Book"],
+      fire: ["Whistle", "Blanket", "Fire Extinguisher", "Water Bottle", "Mask", "Toothbrush", "Camera"]
+    };
+
+    const correctItems = ["Whistle", "Blanket", "First Aid Kit", "Water Bottle", "Canned Food", "Flashlight", "Raincoat", "Mask", "Fire Extinguisher", "Dry Food", "Extra Batteries"];
+
+    let score = 100;
+    let timeLeft = 60;
+    let timerInterval;
+
+    function startGame(disaster) {
+      clearInterval(timerInterval);
+      document.getElementById("gameArea").innerHTML = "";
+      score = 100;
+      timeLeft = 60;
+      updateDisplay();
+
+      const items = disasterItems[disaster];
+      const gameArea = document.getElementById("gameArea");
+
+      items.forEach(item => {
+        const div = document.createElement("div");
+        div.classList.add("item");
+        div.textContent = item;
+        div.onclick = () => handleItemClick(div, item);
+        gameArea.appendChild(div);
+      });
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame("Time’s up!");
+        }
+      }, 1000);
+    }
+
+    function handleItemClick(element, item) {
+      if (element.classList.contains("wrong") || element.classList.contains("right")) return;
+
+      if (correctItems.includes(item)) {
+        element.classList.add("right");
+      } else {
+        element.classList.add("wrong");
+        score -= 10;
+      }
+
+      updateDisplay();
+
+      // Check if all items are selected
+      const totalItems = document.querySelectorAll(".item").length;
+      const selected = document.querySelectorAll(".item.right, .item.wrong").length;
+      if (selected === totalItems) {
+        clearInterval(timerInterval);
+        endGame("You’ve packed your kit!");
+      }
+    }
+
+    function updateDisplay() {
+      document.getElementById("timer").textContent = `⏱️ Time: ${timeLeft}s`;
+      document.getElementById("score").textContent = `💯 Score: ${score}`;
+    }
+
+    function endGame(message) {
+      alert(`${message}\nYour final score: ${score}`);
+    }
+  </script>
+</body>
+</html>
